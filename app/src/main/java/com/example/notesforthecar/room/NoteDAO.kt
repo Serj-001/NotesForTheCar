@@ -13,7 +13,7 @@ interface NoteDAO {
     @Insert
     suspend fun addNote(noteEntity: NoteEntity)
 
-    @Query("SELECT * FROM noteentity")
+    @Query("SELECT * FROM noteentity ORDER BY dateAdded DESC")
     fun getAllNotes(): Flow<List<NoteEntity>>
 
     @Delete

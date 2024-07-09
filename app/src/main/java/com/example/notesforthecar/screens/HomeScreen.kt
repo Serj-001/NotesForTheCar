@@ -21,12 +21,13 @@ fun HomeScreen() {
         composable(route = "Main") {
             MainScreen(viewModel = myViewModel, navController )
         }
-        composable("Card/{noteId}/{noteDescription}") {
+        composable("Card/{noteId}/{noteDescription}/{costType}") {
             CardScreen(
                 navController,
                 viewModel = myViewModel,
                 noteId = it.arguments?.getString("noteId"),
-                noteDescription = it.arguments?.getString("noteDescription")
+                noteDescription = it.arguments?.getString("noteDescription"),
+                costType = it.arguments?.getString("noteDescription")
             )
         }
     }

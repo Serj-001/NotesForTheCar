@@ -1,6 +1,5 @@
 package com.example.notesforthecar.screens
 
-import android.provider.ContactsContract.CommonDataKinds.Note
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,13 +36,15 @@ import androidx.navigation.NavController
 import com.example.notesforthecar.R
 import com.example.notesforthecar.room.NoteEntity
 import com.example.notesforthecar.viewmodel.NoteViewModel
+import java.util.Date
 
 @Composable
 fun CardScreen(
     navController: NavController,
     viewModel: NoteViewModel,
     noteId: String?,
-    noteDescription: String?
+    noteDescription: String?,
+    costType: String?
 ) {
     val showDialog = remember {
         mutableStateOf(false)
@@ -50,8 +52,9 @@ fun CardScreen(
     val updateDialog = remember {
         mutableStateOf(false)
     }
-    var inputNote by remember { mutableStateOf("") }
+    var inputNote by remember { mutableStateOf(noteDescription) }
     val empty by remember { mutableStateOf("") }
+    var inputCostType by remember { mutableStateOf(costType) }
     
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -96,14 +99,6 @@ fun CardScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(30.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(MaterialTheme.colorScheme.background)
-                ) {
-
-                }
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.Bottom,
@@ -160,7 +155,9 @@ fun CardScreen(
                         if(noteId != null) {
                             viewModel.deleteNote(
                                 note = NoteEntity(id = noteId.toInt(),
-                                    description = noteDescription.toString()
+                                    description = noteDescription.toString(),
+                                    dateAdded = Date().time,
+                                    costType = inputCostType.toString()
                                 )
                             )
                         }
@@ -201,10 +198,14 @@ fun CardScreen(
                 }
             },
             confirmButton = {
-                if (inputNote.isNotEmpty())
+                if (inputNote!!.isNotEmpty())
                     Button(
                         onClick = {
-                            val newNote = NoteEntity(noteId!!.toInt(), inputNote)
+                            val newNote = NoteEntity(
+                                noteId!!.toInt(),
+                                inputNote.toString(),
+                                dateAdded = Date().time,
+                                inputCostType.toString())
                             viewModel.updateNote(newNote)
                             navController.popBackStack()
                             updateDialog.value = false
@@ -223,12 +224,18 @@ fun CardScreen(
                 )
             },
             text = {
-                OutlinedTextField(
-                    value = inputNote,
-                    onValueChange = {inputNote = it},
-                    label = { Text(text = "Note description")},
-                    placeholder = { Text(text = "Enter description")}
-                )
+
+
+                Column {
+                    inputCostType = CostTypeDropMenu()
+
+                    OutlinedTextField(
+                        value = inputNote.toString(),
+                        onValueChange = { inputNote = it },
+                        label = { Text(text = "Note description") },
+                        placeholder = { Text(text = "Enter description") }
+                    )
+                }
             }
         )
     }

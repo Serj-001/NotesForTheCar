@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,11 +39,15 @@ import androidx.navigation.NavController
 import com.example.notesforthecar.R
 import com.example.notesforthecar.room.NoteEntity
 import com.example.notesforthecar.viewmodel.NoteViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
     var inputNote by remember { mutableStateOf("") }
+    var noteCostType by remember { mutableStateOf("") }
     val empty by remember { mutableStateOf("") }
     var showDialog by remember {
         mutableStateOf(false)
@@ -99,7 +102,9 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                     Card(
                         onClick = {
                             navController.navigate(
-                                route = "Card/${Uri.encode(it.id.toString())}/${Uri.encode(it.description)}"
+                                route = "Card/${Uri.encode(it.id.toString())}" +
+                                        "/${Uri.encode(it.description)}" +
+                                        "/${Uri.encode(it.costType)}"
                             )
                         },
                         modifier = Modifier
@@ -107,24 +112,25 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                             .padding(5.dp),
                         elevation = CardDefaults.cardElevation(4.dp)
                     ) {
-                        Row() {
+                        Column{
                             Text(
-                                text = "" + it.id,
+                                text = "" + it.costType,
                                 fontSize = 24.sp,
-                                modifier = Modifier.padding(14.dp),
-                                color = MaterialTheme.colorScheme.primary
+                                modifier = Modifier.padding(start = 14.dp, end = 14.dp),
                             )
                             Text(
                                 text = "" + it.description,
-                                fontSize = 24.sp,
+                                fontSize = 22.sp,
                                 modifier = Modifier.padding(14.dp),
                             )
+                            Text(
+                                text = "" + ConvertLongToString(it.dateAdded),
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(start = 14.dp, end = 14.dp)
+                            )
                         }
-
                     }
-
                 }
-
             }
         }
     }
@@ -137,6 +143,7 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                     onClick = {
                         showDialog = false
                         inputNote = empty
+                        noteCostType = empty
                     }
                 ) {
                     Text(text = "Cancel")
@@ -146,9 +153,12 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                 if (inputNote.isNotEmpty())
                     Button(
                         onClick = {
-                            viewModel.addNote(NoteEntity(0, inputNote))
+                            viewModel.addNote(NoteEntity(
+                                id = 0, inputNote, dateAdded = Date().time, noteCostType)
+                            )
                             showDialog = false
                             inputNote = empty
+                            noteCostType = empty
                         }
                     ) {
                         Text(text = "Save")
@@ -163,13 +173,24 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                 )
             },
             text = {
-                OutlinedTextField(
-                    value = inputNote,
-                    onValueChange = {inputNote = it},
-                    label = { Text(text = "Note description")},
-                    placeholder = { Text(text = "Enter description")}
-                )
+
+                Column {
+                    noteCostType = CostTypeDropMenu()
+
+                    OutlinedTextField(
+                        value = inputNote,
+                        onValueChange = { inputNote = it },
+                        label = { Text(text = "Note description") },
+                        placeholder = { Text(text = "Enter description") }
+                    )
+                }
             }
         )
     }
+}
+
+fun ConvertLongToString(timeLong: Long) : String {
+    val dateFormatt = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val dateLocal = dateFormatt.format(timeLong)
+    return dateLocal
 }
