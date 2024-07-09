@@ -22,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,7 +45,8 @@ fun CardScreen(
     viewModel: NoteViewModel,
     noteId: String?,
     noteDescription: String?,
-    costType: String?
+    costType: String?,
+    costOfExpenses: String?
 ) {
     val showDialog = remember {
         mutableStateOf(false)
@@ -55,7 +57,8 @@ fun CardScreen(
     var inputNote by remember { mutableStateOf(noteDescription) }
     val empty by remember { mutableStateOf("") }
     var inputCostType by remember { mutableStateOf(costType) }
-    
+    var inputCost by remember { mutableStateOf(costOfExpenses) }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
@@ -74,30 +77,9 @@ fun CardScreen(
             ) {
                 
                 Spacer(modifier = Modifier.height(40.dp))
-                Row {
-                    Text(
-                        text = "id: ",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "" + noteId,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        text = "Description: ",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "" + noteDescription,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                }
+
+                Text(text = noteDescription.toString())
+
                 Spacer(modifier = Modifier.height(30.dp))
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
@@ -114,9 +96,15 @@ fun CardScreen(
                         Row {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_delete_24),
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
                             )
-                            Text(text = "Delete")
+                            Text(
+                                text = "Удалить",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
                     }
                     OutlinedIconButton(
@@ -131,7 +119,10 @@ fun CardScreen(
                                 painter = painterResource(id = R.drawable.baseline_edit_24),
                                 contentDescription = null
                             )
-                            Text(text = "Update")
+                            Text(
+                                text = "Изменить",
+                                fontSize = 14.sp
+                            )
                         }
                     }
                 }
@@ -146,7 +137,11 @@ fun CardScreen(
                 Button(
                     onClick = { showDialog.value = false }
                 ) {
-                    Text(text = "No")
+                    Text(
+                        text = "Нет",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             },
             confirmButton = {
@@ -157,7 +152,8 @@ fun CardScreen(
                                 note = NoteEntity(id = noteId.toInt(),
                                     description = noteDescription.toString(),
                                     dateAdded = Date().time,
-                                    costType = inputCostType.toString()
+                                    costType = inputCostType.toString(),
+                                    costOfExpenses = inputCost!!.toInt()
                                 )
                             )
                         }
@@ -165,19 +161,24 @@ fun CardScreen(
                         navController.popBackStack()
                     }
                 ) {
-                    Text(text = "Yes")
+                    Text(
+                        text = "Да",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             },
             title = {
                 Text(
-                    text = "Delete book",
+                    text = "Удалить?",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 25.sp
+                    fontSize = 25.sp,
+                    color = MaterialTheme.colorScheme.error
                 )
             },
             text = {
                 Text(
-                    text = "Are you sure?",
+                    text = "Запись будет удалена",
                     fontSize = 20.sp
                 )
             }
@@ -192,6 +193,7 @@ fun CardScreen(
                     onClick = {
                         updateDialog.value = false
                         inputNote = empty
+                        inputCost = empty
                     }
                 ) {
                     Text(text = "Cancel")
@@ -205,11 +207,14 @@ fun CardScreen(
                                 noteId!!.toInt(),
                                 inputNote.toString(),
                                 dateAdded = Date().time,
-                                inputCostType.toString())
+                                inputCostType.toString(),
+                                inputCost!!.toInt()
+                            )
                             viewModel.updateNote(newNote)
                             navController.popBackStack()
                             updateDialog.value = false
                             inputNote = empty
+                            inputCost = empty
                         }
                     ) {
                         Text(text = "Update")
@@ -232,6 +237,12 @@ fun CardScreen(
                     OutlinedTextField(
                         value = inputNote.toString(),
                         onValueChange = { inputNote = it },
+                        label = { Text(text = "Note description") },
+                        placeholder = { Text(text = "Enter description") }
+                    )
+                    OutlinedTextField(
+                        value = inputCost.toString(),
+                        onValueChange = { inputCost = it },
                         label = { Text(text = "Note description") },
                         placeholder = { Text(text = "Enter description") }
                     )

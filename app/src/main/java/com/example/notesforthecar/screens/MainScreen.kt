@@ -3,17 +3,17 @@ package com.example.notesforthecar.screens
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,12 +29,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.isDigitsOnly
 import androidx.navigation.NavController
 import com.example.notesforthecar.R
 import com.example.notesforthecar.room.NoteEntity
@@ -48,6 +49,7 @@ import java.util.Locale
 fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
     var inputNote by remember { mutableStateOf("") }
     var noteCostType by remember { mutableStateOf("") }
+    var noteCost by remember { mutableStateOf("") }
     val empty by remember { mutableStateOf("") }
     var showDialog by remember {
         mutableStateOf(false)
@@ -59,7 +61,7 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Notes",
+                        text = "Затраты авто:",
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.background
                     )
@@ -80,23 +82,50 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                 )
             }
         }
-    ) {
-        if (notes.isEmpty()) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+    ) { innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
+        ) {
+            Row(
                 modifier = Modifier
-                    .padding(it)
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .padding(14.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "No notes")
+                Column {
+                    Text(
+                        text = "Заправка: ${SumOfColumnRefill(notes)}",
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "Запчасти: ${SumOfColumnPart(notes)}",
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "Ремонт: ${SumOfColumnRepair(notes)}",
+                        fontSize = 14.sp
+                    )
+                }
+                Column {
+                    Text(
+                        text = "Всего:",
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Text(
+                        text = "${SumAllRepair(notes)} р.",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
-        } else {
+
             LazyColumn(
                 modifier = Modifier
-                    .padding(it)
-                    .fillMaxSize(),
-                contentPadding = PaddingValues(10.dp)
+                    .fillMaxSize()
+                    .padding(4.dp)
             ) {
                 items(notes) {
                     Card(
@@ -104,30 +133,41 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                             navController.navigate(
                                 route = "Card/${Uri.encode(it.id.toString())}" +
                                         "/${Uri.encode(it.description)}" +
-                                        "/${Uri.encode(it.costType)}"
+                                        "/${Uri.encode(it.costType)}" +
+                                        "/${Uri.encode(it.costOfExpenses.toString())}"
                             )
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(5.dp),
-                        elevation = CardDefaults.cardElevation(4.dp)
+                        //elevation = CardDefaults.cardElevation(4.dp)
                     ) {
-                        Column{
+                        Column {
                             Text(
                                 text = "" + it.costType,
-                                fontSize = 24.sp,
+                                fontSize = 20.sp,
                                 modifier = Modifier.padding(start = 14.dp, end = 14.dp),
                             )
                             Text(
                                 text = "" + it.description,
-                                fontSize = 22.sp,
-                                modifier = Modifier.padding(14.dp),
-                            )
-                            Text(
-                                text = "" + ConvertLongToString(it.dateAdded),
                                 fontSize = 18.sp,
-                                modifier = Modifier.padding(start = 14.dp, end = 14.dp)
+                                modifier = Modifier.padding(start = 14.dp, end = 14.dp),
                             )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "" + ConvertLongToString(it.dateAdded),
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(start = 14.dp, end = 14.dp)
+                                )
+                                Text(
+                                    text = "${it.costOfExpenses} руб.",
+                                    fontSize = 14.sp,
+                                )
+                            }
                         }
                     }
                 }
@@ -144,29 +184,37 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                         showDialog = false
                         inputNote = empty
                         noteCostType = empty
+                        noteCost = empty
                     }
                 ) {
-                    Text(text = "Cancel")
+                    Text(text = "Отмена")
                 }
             },
             confirmButton = {
                 if (inputNote.isNotEmpty())
                     Button(
                         onClick = {
-                            viewModel.addNote(NoteEntity(
-                                id = 0, inputNote, dateAdded = Date().time, noteCostType)
+                            viewModel.addNote(
+                                NoteEntity(
+                                    id = 0,
+                                    inputNote,
+                                    dateAdded = Date().time,
+                                    noteCostType,
+                                    noteCost.toInt()
+                                )
                             )
                             showDialog = false
                             inputNote = empty
                             noteCostType = empty
+                            noteCost = empty
                         }
                     ) {
-                        Text(text = "Save")
+                        Text(text = "Сохранить")
                     }
             },
             title = {
                 Text(
-                    text = "Add note",
+                    text = "Добавить запись",
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
                     modifier = Modifier.padding(5.dp)
@@ -180,8 +228,17 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                     OutlinedTextField(
                         value = inputNote,
                         onValueChange = { inputNote = it },
-                        label = { Text(text = "Note description") },
-                        placeholder = { Text(text = "Enter description") }
+                        label = { Text(text = "Описание") },
+                        placeholder = { Text(text = "Введите описание...") }
+                    )
+                    OutlinedTextField(
+                        value = noteCost,
+                        onValueChange = { if (it.isDigitsOnly()) noteCost = it },
+                        label = { Text(text = "Стоимость") },
+                        placeholder = { Text(text = "Введите стоимость...") },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
                     )
                 }
             }
@@ -189,8 +246,40 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
     }
 }
 
-fun ConvertLongToString(timeLong: Long) : String {
+fun ConvertLongToString(timeLong: Long): String {
     val dateFormatt = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val dateLocal = dateFormatt.format(timeLong)
     return dateLocal
+}
+
+fun SumOfColumnRefill(notes: List<NoteEntity>): Int {
+    var sum = 0
+    for (item in notes) {
+        if (item.costType == "Заправка") sum += item.costOfExpenses
+    }
+    return sum
+}
+
+fun SumOfColumnPart(notes: List<NoteEntity>): Int {
+    var sum = 0
+    for (item in notes) {
+        if (item.costType == "Запчасти") sum += item.costOfExpenses
+    }
+    return sum
+}
+
+fun SumOfColumnRepair(notes: List<NoteEntity>): Int {
+    var sum = 0
+    for (item in notes) {
+        if (item.costType == "Ремонт") sum += item.costOfExpenses
+    }
+    return sum
+}
+
+fun SumAllRepair(notes: List<NoteEntity>): Int {
+    var sum = 0
+    for (item in notes) {
+        sum += item.costOfExpenses
+    }
+    return sum
 }

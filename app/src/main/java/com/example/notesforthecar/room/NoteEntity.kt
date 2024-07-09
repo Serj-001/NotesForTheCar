@@ -9,5 +9,6 @@ data class NoteEntity(
     val id: Int,
     val description: String,
     val dateAdded: Long,
-    val costType: String
+    val costType: String,
+    val costOfExpenses: Int
 )
