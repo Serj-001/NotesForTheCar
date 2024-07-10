@@ -61,6 +61,7 @@ fun CardScreen(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
         Card(
@@ -196,7 +197,7 @@ fun CardScreen(
                         inputCost = empty
                     }
                 ) {
-                    Text(text = "Cancel")
+                    Text(text = "Отмена")
                 }
             },
             confirmButton = {
@@ -217,34 +218,34 @@ fun CardScreen(
                             inputCost = empty
                         }
                     ) {
-                        Text(text = "Update")
+                        Text(text = "Изменить")
                     }
             },
             title = {
                 Text(
-                    text = "Update note",
+                    text = "Изменить запись",
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
                     modifier = Modifier.padding(5.dp)
                 )
             },
             text = {
-
-
                 Column {
                     inputCostType = CostTypeDropMenu()
 
                     OutlinedTextField(
                         value = inputNote.toString(),
                         onValueChange = { inputNote = it },
-                        label = { Text(text = "Note description") },
-                        placeholder = { Text(text = "Enter description") }
+                        label = { Text(text = "Описание") },
+                        placeholder = { Text(text = "Введите описание...") },
+                        shape = RoundedCornerShape(16.dp)
                     )
                     OutlinedTextField(
                         value = inputCost.toString(),
                         onValueChange = { inputCost = it },
-                        label = { Text(text = "Note description") },
-                        placeholder = { Text(text = "Enter description") }
+                        label = { Text(text = "Стоимость") },
+                        placeholder = { Text(text = "Введите стоимость...") },
+                        shape = RoundedCornerShape(16.dp)
                     )
                 }
             }
