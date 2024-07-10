@@ -1,7 +1,6 @@
 package com.example.notesforthecar.screens
 
 import android.net.Uri
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,6 +46,7 @@ import com.example.notesforthecar.viewmodel.NoteViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,10 +67,10 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                     Text(
                         text = "Затраты авто:",
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.background
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.primary)
+                colors = TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.primaryContainer)
             )
         },
         floatingActionButton = {
@@ -93,11 +92,11 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.background)
         ) {
             Card(
                 modifier = Modifier.padding(10.dp),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
-                border = BorderStroke(2.dp,MaterialTheme.colorScheme.primary)
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.tertiaryContainer)
             ) {
                 Row(
                     modifier = Modifier
@@ -126,12 +125,10 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                     Column {
                         Text(
                             text = "Всего:",
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.error
+                            fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "${SumAllRepair(notes)} р.",
-                            color = MaterialTheme.colorScheme.error
+                            text = "${SumAllRepair(notes)} р."
                         )
                     }
                 }
@@ -155,18 +152,22 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(5.dp),
-                        //elevation = CardDefaults.cardElevation(4.dp)
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
                     ) {
                         Column {
                             Text(
                                 text = "" + it.costType,
                                 fontSize = 20.sp,
                                 modifier = Modifier.padding(start = 14.dp, end = 14.dp),
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                             Text(
                                 text = "" + it.description,
                                 fontSize = 18.sp,
                                 modifier = Modifier.padding(start = 14.dp, end = 14.dp),
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                             Row(
                                 modifier = Modifier
@@ -176,11 +177,13 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                                 Text(
                                     text = "" + ConvertLongToString(it.dateAdded),
                                     fontSize = 14.sp,
-                                    modifier = Modifier.padding(start = 14.dp, end = 14.dp)
+                                    modifier = Modifier.padding(start = 14.dp, end = 14.dp),
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                                 Text(
                                     text = "${it.costOfExpenses} руб.",
                                     fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             }
                         }
@@ -205,6 +208,7 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                     Text(text = "Отмена")
                 }
             },
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
             confirmButton = {
                 if (inputNote.isNotEmpty())
                     Button(
@@ -232,26 +236,37 @@ fun MainScreen(viewModel: NoteViewModel, navController: NavController) {
                     text = "Добавить запись",
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
-                    modifier = Modifier.padding(5.dp)
+                    modifier = Modifier.padding(5.dp),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             },
             text = {
 
                 Column {
-                    noteCostType = CostTypeDropMenu()
+                    noteCostType = costTypeDropMenu()
 
                     OutlinedTextField(
                         value = inputNote,
                         onValueChange = { inputNote = it },
                         label = { Text(text = "Описание") },
-                        placeholder = { Text(text = "Введите описание...") },
+                        placeholder = {
+                            Text(
+                                text = "Введите описание...",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        },
                         shape = RoundedCornerShape(16.dp)
                     )
                     OutlinedTextField(
                         value = noteCost,
                         onValueChange = { if (it.isDigitsOnly()) noteCost = it },
                         label = { Text(text = "Стоимость") },
-                        placeholder = { Text(text = "Введите стоимость...") },
+                        placeholder = {
+                            Text(
+                                text = "Введите стоимость...",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        },
                         shape = RoundedCornerShape(16.dp),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number

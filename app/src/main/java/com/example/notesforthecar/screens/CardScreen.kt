@@ -1,6 +1,5 @@
 package com.example.notesforthecar.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,19 +15,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -69,7 +67,9 @@ fun CardScreen(
                 .fillMaxWidth()
                 .height(250.dp)
                 .padding(15.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -79,7 +79,10 @@ fun CardScreen(
                 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text(text = noteDescription.toString())
+                Text(
+                    text = noteDescription.toString(),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
 
                 Spacer(modifier = Modifier.height(30.dp))
                 Row(
@@ -92,19 +95,20 @@ fun CardScreen(
                     OutlinedIconButton(
                         onClick = { showDialog.value = true },
                         shape = RoundedCornerShape(50.dp),
-                        modifier = Modifier.size(height = 50.dp, width = 100.dp)
+                        modifier = Modifier.size(height = 50.dp, width = 100.dp),
+                        colors = IconButtonDefaults.iconButtonColors(MaterialTheme.colorScheme.primary)
                     ) {
                         Row {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_delete_24),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                             Text(
                                 text = "Удалить",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.error
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -113,16 +117,19 @@ fun CardScreen(
                             updateDialog.value = true
                         },
                         shape = RoundedCornerShape(50.dp),
-                        modifier = Modifier.size(height = 50.dp, width = 110.dp)
+                        modifier = Modifier.size(height = 50.dp, width = 110.dp),
+                        colors = IconButtonDefaults.iconButtonColors(MaterialTheme.colorScheme.primary)
                     ) {
                         Row {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_edit_24),
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                             Text(
                                 text = "Изменить",
-                                fontSize = 14.sp
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -226,12 +233,13 @@ fun CardScreen(
                     text = "Изменить запись",
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp,
-                    modifier = Modifier.padding(5.dp)
+                    modifier = Modifier.padding(5.dp),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             },
             text = {
                 Column {
-                    inputCostType = CostTypeDropMenu()
+                    inputCostType = costTypeDropMenu()
 
                     OutlinedTextField(
                         value = inputNote.toString(),
@@ -248,7 +256,8 @@ fun CardScreen(
                         shape = RoundedCornerShape(16.dp)
                     )
                 }
-            }
+            },
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     }
 }

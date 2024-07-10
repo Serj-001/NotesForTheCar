@@ -5,6 +5,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +18,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CostTypeDropMenu() : String {
+fun costTypeDropMenu() : String {
     val listType = listOf("Заправка", "Запчасти", "Ремонт")
     var selectedText by remember {
         mutableStateOf("")
@@ -28,15 +29,20 @@ fun CostTypeDropMenu() : String {
 
     ExposedDropdownMenuBox(
         expanded = isExpanded,
-        onExpandedChange = {isExpanded = !isExpanded}
+        onExpandedChange = { isExpanded = !isExpanded }
     ) {
         OutlinedTextField(
             modifier = Modifier.menuAnchor(),
             value = selectedText,
-            placeholder = { Text(text = "Выбрать тип затрат") },
+            placeholder = {
+                Text(
+                    text = "Выбрать тип затрат",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            },
             onValueChange = {},
             readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)},
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
             shape = RoundedCornerShape(16.dp)
         )
         ExposedDropdownMenu(

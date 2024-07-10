@@ -9,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.notesforthecar.screens.HomeScreen
-import com.example.notesforthecar.screens.MainScreen
 import com.example.notesforthecar.ui.theme.NotesForTheCarTheme
 
 class MainActivity : ComponentActivity() {
