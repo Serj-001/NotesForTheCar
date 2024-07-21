@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 fun costTypeDropMenu() : String {
     val listType = listOf("Заправка", "Запчасти", "Ремонт")
     var selectedText by remember {
-        mutableStateOf("")
+        mutableStateOf("Заправка")
     }
     var isExpanded by remember {
         mutableStateOf(false)

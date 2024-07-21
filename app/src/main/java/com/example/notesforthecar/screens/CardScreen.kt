@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,13 +77,25 @@ fun CardScreen(
                 verticalArrangement = Arrangement.Bottom,
                 modifier = Modifier.fillMaxSize()
             ) {
-                
+
                 Spacer(modifier = Modifier.height(40.dp))
+
+                Text(
+                    text = costType.toString(),
+                    fontSize = 24.sp, fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
 
                 Text(
                     text = noteDescription.toString(),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                )
+
+                Text(
+                    text = costOfExpenses.toString() + " р.",
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
 
                 Spacer(modifier = Modifier.height(30.dp))
                 Row(
